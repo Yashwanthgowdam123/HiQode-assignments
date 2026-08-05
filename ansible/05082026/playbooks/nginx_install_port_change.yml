@@ -1,0 +1,51 @@
+---
+#############################################################################################################
+#write a playbook to install nginx, and change the port from 80 to 8081 and deploy some application into it.#
+#############################################################################################################
+- name: Install and Configure Nginx
+  hosts: "{{ host }}"
+  become: yes
+  gather_facts: no
+
+  vars:
+    desired_port: "{{ desired_port }}"
+
+  tasks:
+
+    - name: Install nginx on {{ inventory_hostname }}
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Change nginx port to 8081 on {{ inventory_hostname }}
+      replace:
+        path: /etc/nginx/sites-available/default
+        regexp: 'listen 80 default_server;'
+        replace: 'listen {{ desired_port }} default_server;'
+      register: port_change
+
+    - name: Replace IPv4 & IPv6 ports
+      replace:
+        path: /etc/nginx/sites-available/default
+        regexp: 'listen \[::\]:80 default_server;'
+        replace: 'listen [::]:{{ desired_port }} default_server;'
+
+
+    - name: Deploy application
+      copy:
+        src: /opt/ansible/test/index.html
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Restart nginx on {{ inventory_hostname }}
+      service:
+        name: nginx
+        state: restarted
+        enabled: yes
+
+    - name: verfication.....
+      debug:
+        msg: "http://{{ inventory_hostname }}:{{ desired_port }}"

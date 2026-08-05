@@ -1,0 +1,32 @@
+---
+######################################################################
+# Playbook: Get Target Instance Report
+# Report:
+#   - Hostname
+#   - CPU
+#   - RAM
+#   - Storage
+######################################################################
+
+- name: Generate System Report
+  hosts: "{{ host }}"
+  become: yes
+  gather_facts: yes
+
+  tasks:
+
+    - name: Get total storage size
+      shell: |
+        lsblk -bdno SIZE | awk '{sum+=$1} END {printf "%.2f GB", sum/1024/1024/1024}'
+      register: storage
+      changed_when: false
+
+    - name: Display System Report
+      debug:
+        msg:
+          - "======================================"
+          - "Hostname : {{ ansible_hostname }}"
+          - "CPU      : {{ ansible_processor_vcpus }} vCPUs"
+          - "RAM      : {{ ansible_memtotal_mb }} MB ({{ (ansible_memtotal_mb / 1024) | round(2) }} GB)"
+          - "Storage  : {{ storage.stdout }}"
+          - "======================================"

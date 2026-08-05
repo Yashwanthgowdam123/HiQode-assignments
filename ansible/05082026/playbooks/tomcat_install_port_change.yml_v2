@@ -1,0 +1,45 @@
+---
+#####################################################################
+# Install Tomcat and change default port from 8080 to 9090
+#####################################################################
+
+- name: Install and Configure Tomcat
+  hosts: "{{ host }}"
+  become: yes
+  gather_facts: no
+
+  vars:
+    tomcat_port: "{{ tomcat_port }}"
+
+  tasks:
+
+    - name: Update & install tomcat10
+      shell: |
+        apt update -y 
+        apt install tomcat10 -y
+        systemctl start tomcat10
+      register: tomcat_installed
+
+    - name: Pause for 20seconds
+      pause: 
+        seconds: 20
+
+    - name: Change Tomcat port
+      replace:
+        path: /etc/tomcat10/server.xml
+        regexp: 'Connector port="8080"'
+        replace: 'Connector port="{{ tomcat_port }}"'
+        backup: yes
+
+    - name: restart after port change
+      shell: systemctl restart tomcat10
+
+    - name: Wait for Tomcat to start
+      wait_for:
+        port: "{{ tomcat_port }}"
+        timeout: 60
+
+    - name: Display URL
+      debug:
+        msg: "Tomcat is running on port {{ tomcat_port }} : http://{{ inventory_hostname }}:{{ tomcat_port }}"
+
