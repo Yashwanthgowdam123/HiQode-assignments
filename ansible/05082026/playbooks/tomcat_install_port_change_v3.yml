@@ -1,0 +1,39 @@
+---
+- name: Install Tomcat10 and Change Port
+  hosts: "{{ host }}"
+  become: yes
+
+  vars:
+    tomcat_port: 9090
+
+  tasks:
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Tomcat10
+      apt:
+        name: tomcat10
+        state: present
+
+    - name: Change Tomcat port from 8080 to 9090
+      replace:
+        path: /etc/tomcat10/server.xml
+        regexp: 'port="8080"'
+        replace: 'port="{{ tomcat_port }}"'
+
+    - name: Restart Tomcat
+      service:
+        name: tomcat10
+        state: restarted
+        enabled: yes
+
+    - name: Verify Tomcat service
+      service:
+        name: tomcat10
+        state: started
+
+    - name: Display completion message
+      debug:
+        msg: "Tomcat10 installed successfully and running on port {{ tomcat_port }}: http://{{ inventory_hostname }}:{{ tomcat_port }}"

@@ -54,55 +54,99 @@ PLAY RECAP *********************************************************************
 [0;33m54.234.22.122[0m              : [0;32mok=6   [0m [0;33mchanged=4   [0m unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 
 ###################################################################################################################################
+
 Q2. Install tomcat using playbook and change the port 8080 to 9090.
-ansible-playbook /opt/ansible/playbooks/tomcat_install_port_change.yml -u ubuntu -e "host=aws-servers tomcat_port=9090" --list-hosts
+
+inventories$ ansible-playbook /opt/ansible/playbooks/tomcat_install_port_change_v3.yml -e "host=today_tomcat_v2" --list-hosts
+
+playbook: /opt/ansible/playbooks/tomcat_install_port_change_v3.yml
+
+  play #1 (today_tomcat_v2): Install Tomcat10 and Change Port   TAGS: []
+    pattern: ['today_tomcat_v2']
+    hosts (2):
+      100.31.88.101
+      3.92.84.231
+
+inventories$ ansible-playbook /opt/ansible/playbooks/tomcat_install_port_change_v3.yml -e "host=today_tomcat_v2"
+
+PLAY [Install Tomcat10 and Change Port] *******************************************************************************************
+
+TASK [Gathering Facts] ************************************************************************************************************
+ok: [3.92.84.231]
+ok: [100.31.88.101]
+
+TASK [Update apt cache] ***********************************************************************************************************
+changed: [100.31.88.101]
+changed: [3.92.84.231]
+
+TASK [Install Tomcat10] ***********************************************************************************************************
+changed: [3.92.84.231]
+changed: [100.31.88.101]
+
+TASK [Change Tomcat port from 8080 to 9090] ***************************************************************************************
+changed: [100.31.88.101]
+changed: [3.92.84.231]
+
+TASK [Restart Tomcat] *************************************************************************************************************
+changed: [3.92.84.231]
+changed: [100.31.88.101]
+
+TASK [Verify Tomcat service] ******************************************************************************************************
+ok: [3.92.84.231]
+ok: [100.31.88.101]
+
+TASK [Display completion message] *************************************************************************************************
+ok: [3.92.84.231] => {
+    "msg": "Tomcat10 installed successfully and running on port 9090: http://3.92.84.231:9090"
+}
+ok: [100.31.88.101] => {
+    "msg": "Tomcat10 installed successfully and running on port 9090: http://100.31.88.101:9090"
+}
+
+PLAY RECAP ************************************************************************************************************************
+100.31.88.101              : ok=7    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+3.92.84.231                : ok=7    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+##################################################################################################################################
+Q3. write a playbook to get the Target instances report below:
+
+ansible-playbook /opt/ansible/playbooks/resource_manager.yml -u ubuntu -e "host=today_tomcat_v2" --list-hosts
 
 playbook: /opt/ansible/playbooks/resource_manager.yml
 
-  play #1 (target_tomcat): Generate System Report	TAGS: []
-    pattern: ['target_tomcat']
-    hosts (3):
-      75.101.209.140
-      18.234.62.53
-      3.80.79.178
+  play #1 (today_tomcat_v2): Generate System Report	TAGS: []
+    pattern: ['today_tomcat_v2']
+    hosts (2):
+      3.92.84.231
+      100.31.88.101
+
+ansible-playbook /opt/ansible/playbooks/resource_manager.yml -u ubuntu -e "host=today_tomcat_v2" 
 
 PLAY [Generate System Report] **************************************************
 
 TASK [Gathering Facts] *********************************************************
-[0;32mok: [3.80.79.178][0m
-[0;32mok: [18.234.62.53][0m
-[0;32mok: [75.101.209.140][0m
+[0;32mok: [3.92.84.231][0m
+[0;32mok: [100.31.88.101][0m
 
 TASK [Get total storage size] **************************************************
-[0;32mok: [3.80.79.178][0m
-[0;32mok: [75.101.209.140][0m
-[0;32mok: [18.234.62.53][0m
+[0;32mok: [3.92.84.231][0m
+[0;32mok: [100.31.88.101][0m
 
 TASK [Display System Report] ***************************************************
-[0;32mok: [3.80.79.178] => {[0m
+[0;32mok: [100.31.88.101] => {[0m
 [0;32m    "msg": [[0m
 [0;32m        "======================================",[0m
-[0;32m        "Hostname : ip-172-31-31-225",[0m
+[0;32m        "Hostname : ip-172-31-21-254",[0m
 [0;32m        "CPU      : 2 vCPUs",[0m
 [0;32m        "RAM      : 908 MB (0.89 GB)",[0m
 [0;32m        "Storage  : 8.15 GB",[0m
 [0;32m        "======================================"[0m
 [0;32m    ][0m
 [0;32m}[0m
-[0;32mok: [18.234.62.53] => {[0m
+[0;32mok: [3.92.84.231] => {[0m
 [0;32m    "msg": [[0m
 [0;32m        "======================================",[0m
-[0;32m        "Hostname : ip-172-31-19-155",[0m
-[0;32m        "CPU      : 2 vCPUs",[0m
-[0;32m        "RAM      : 908 MB (0.89 GB)",[0m
-[0;32m        "Storage  : 8.15 GB",[0m
-[0;32m        "======================================"[0m
-[0;32m    ][0m
-[0;32m}[0m
-[0;32mok: [75.101.209.140] => {[0m
-[0;32m    "msg": [[0m
-[0;32m        "======================================",[0m
-[0;32m        "Hostname : ip-172-31-27-87",[0m
+[0;32m        "Hostname : ip-172-31-27-222",[0m
 [0;32m        "CPU      : 2 vCPUs",[0m
 [0;32m        "RAM      : 908 MB (0.89 GB)",[0m
 [0;32m        "Storage  : 8.15 GB",[0m
@@ -111,46 +155,6 @@ TASK [Display System Report] ***************************************************
 [0;32m}[0m
 
 PLAY RECAP *********************************************************************
-[0;32m18.234.62.53[0m               : [0;32mok=3   [0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-[0;32m3.80.79.178[0m                : [0;32mok=3   [0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-[0;32m75.101.209.140[0m             : [0;32mok=3   [0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+[0;32m100.31.88.101[0m              : [0;32mok=3   [0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+[0;32m3.92.84.231[0m                : [0;32mok=3   [0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 
-
-playbook: /opt/ansible/playbooks/tomcat_install_port_change.yml
-
-  play #1 (target_tomcat): Install and Configure Tomcat	TAGS: []
-    pattern: ['target_tomcat']
-    hosts (3):
-      75.101.209.140
-      18.234.62.53
-      3.80.79.178
-
-PLAY [Install and Configure Tomcat] ********************************************
-
-TASK [Update & install tomcat10] ***********************************************
-
-PLAY [Install and Configure Tomcat] ********************************************
-
-TASK [Update & install tomcat10] ***********************************************
-[0;31mfatal: [18.234.62.53]: FAILED! => {"ansible_facts": {"discovered_interpreter_python": "/usr/bin/python3"}, "changed": true, "cmd": "apt update -y \napt install tomcat10 -y\nsystemctl start tomcat10\n", "delta": "0:00:00.220574", "end": "2026-08-05 12:45:39.760932", "msg": "non-zero return code", "rc": 5, "start": "2026-08-05 12:45:39.540358", "stderr": "\nWARNING: apt does not have a stable CLI interface. Use with caution in scripts.\n\nError: Could not get lock /var/lib/apt/lists/lock. It is held by process 1692 (apt)\nError: Unable to lock directory /var/lib/apt/lists/\n\nWARNING: apt does not have a stable CLI interface. Use with caution in scripts.\n\nError: Unable to locate package tomcat10\nFailed to start tomcat10.service: Unit tomcat10.service not found.", "stderr_lines": ["", "WARNING: apt does not have a stable CLI interface. Use with caution in scripts.", "", "Error: Could not get lock /var/lib/apt/lists/lock. It is held by process 1692 (apt)", "Error: Unable to lock directory /var/lib/apt/lists/", "", "WARNING: apt does not have a stable CLI interface. Use with caution in scripts.", "", "Error: Unable to locate package tomcat10", "Failed to start tomcat10.service: Unit tomcat10.service not found."], "stdout": "Reading package lists...\nReading package lists...\nBuilding dependency tree...\nReading state information...", "stdout_lines": ["Reading package lists...", "Reading package lists...", "Building dependency tree...", "Reading state information..."]}[0m
-[0;31mfatal: [3.80.79.178]: FAILED! => {"ansible_facts": {"discovered_interpreter_python": "/usr/bin/python3"}, "changed": true, "cmd": "apt update -y \napt install tomcat10 -y\nsystemctl start tomcat10\n", "delta": "0:00:00.200492", "end": "2026-08-05 12:45:39.972216", "msg": "non-zero return code", "rc": 5, "start": "2026-08-05 12:45:39.771724", "stderr": "\nWARNING: apt does not have a stable CLI interface. Use with caution in scripts.\n\nError: Could not get lock /var/lib/apt/lists/lock. It is held by process 1701 (apt)\nError: Unable to lock directory /var/lib/apt/lists/\n\nWARNING: apt does not have a stable CLI interface. Use with caution in scripts.\n\nError: Unable to locate package tomcat10\nFailed to start tomcat10.service: Unit tomcat10.service not found.", "stderr_lines": ["", "WARNING: apt does not have a stable CLI interface. Use with caution in scripts.", "", "Error: Could not get lock /var/lib/apt/lists/lock. It is held by process 1701 (apt)", "Error: Unable to lock directory /var/lib/apt/lists/", "", "WARNING: apt does not have a stable CLI interface. Use with caution in scripts.", "", "Error: Unable to locate package tomcat10", "Failed to start tomcat10.service: Unit tomcat10.service not found."], "stdout": "Reading package lists...\nReading package lists...\nBuilding dependency tree...\nReading state information...", "stdout_lines": ["Reading package lists...", "Reading package lists...", "Building dependency tree...", "Reading state information..."]}[0m
-[0;31mfatal: [75.101.209.140]: FAILED! => {"ansible_facts": {"discovered_interpreter_python": "/usr/bin/python3"}, "changed": true, "cmd": "apt update -y \napt install tomcat10 -y\nsystemctl start tomcat10\n", "delta": "0:00:00.217221", "end": "2026-08-05 12:45:40.076132", "msg": "non-zero return code", "rc": 5, "start": "2026-08-05 12:45:39.858911", "stderr": "\nWARNING: apt does not have a stable CLI interface. Use with caution in scripts.\n\nError: Could not get lock /var/lib/apt/lists/lock. It is held by process 1697 (apt)\nError: Unable to lock directory /var/lib/apt/lists/\n\nWARNING: apt does not have a stable CLI interface. Use with caution in scripts.\n\nError: Unable to locate package tomcat10\nFailed to start tomcat10.service: Unit tomcat10.service not found.", "stderr_lines": ["", "WARNING: apt does not have a stable CLI interface. Use with caution in scripts.", "", "Error: Could not get lock /var/lib/apt/lists/lock. It is held by process 1697 (apt)", "Error: Unable to lock directory /var/lib/apt/lists/", "", "WARNING: apt does not have a stable CLI interface. Use with caution in scripts.", "", "Error: Unable to locate package tomcat10", "Failed to start tomcat10.service: Unit tomcat10.service not found."], "stdout": "Reading package lists...\nReading package lists...\nBuilding dependency tree...\nReading state information...", "stdout_lines": ["Reading package lists...", "Reading package lists...", "Building dependency tree...", "Reading state information..."]}[0m
-
-PLAY RECAP *********************************************************************
-[0;31m18.234.62.53[0m               : ok=0    changed=0    unreachable=0    [0;31mfailed=1   [0m skipped=0    rescued=0    ignored=0   
-[0;31m3.80.79.178[0m                : ok=0    changed=0    unreachable=0    [0;31mfailed=1   [0m skipped=0    rescued=0    ignored=0   
-[0;31m75.101.209.140[0m             : ok=0    changed=0    unreachable=0    [0;31mfailed=1   [0m skipped=0    rescued=0    ignored=0   
-
-
-playbook: /opt/ansible/playbooks/tomcat_install_port_change.yml
-
-  play #1 (target_tomcat_new): Install Tomcat	TAGS: []
-    pattern: ['target_tomcat_new']
-    hosts (3):
-      52.91.159.87
-      13.222.133.80
-      52.91.191.111
-
-PLAY [Install Tomcat] **********************************************************
-
-TASK [Install Java] ************************************************************
