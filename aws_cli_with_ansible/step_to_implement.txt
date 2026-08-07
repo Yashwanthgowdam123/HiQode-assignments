@@ -1,0 +1,45 @@
+# ==========================================================
+# Steps to Create Bash Functions Using Vim
+# ==========================================================
+
+# Step 1: Open the .bashrc file
+vim ~/.bashrc
+
+# Step 2: Go to the end of the file
+Shift + G
+
+# Step 3: Enter Insert mode
+i
+
+# Step 4: Paste your Bash functions
+# (e.g., getec2() and update_inventory())
+
+# Step 5: Exit Insert mode
+Esc
+
+# Step 6: Save and exit
+:wq
+
+# ==========================================================
+# Reload the .bashrc file
+# ==========================================================
+source ~/.bashrc
+
+# ==========================================================
+# Verify the functions are loaded
+# ==========================================================
+type getec2
+type update_inventory
+
+# ==========================================================
+# Example Usage
+# ==========================================================
+getec2
+getec2 public
+getec2 private
+getec2 complete_info
+getec2 create 3
+getec2 delete
+
+update_inventory
+update_inventory webservers

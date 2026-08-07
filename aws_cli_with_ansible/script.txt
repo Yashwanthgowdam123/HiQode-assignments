@@ -1,0 +1,136 @@
+\#creating alias for aws-cli
+getec2() {
+\# ---------- Default values (CHANGE THESE) ----------
+AMI\_ID="ami-0fc5d935ebf8bc3bc"      # Ubuntu 24.04 (us-east-1)
+INSTANCE\_TYPE="t2.micro"
+KEY\_NAME="AwsPrivateKey"
+SECURITY\_GROUP="sg-04848032e00ca7ffd"
+SUBNET\_ID="subnet-04627872790e91e77"
+
+```
+# If no argument is given, show menu
+if [ -z "$1" ]; then
+    echo "==========================="
+    echo "         GET EC2"
+    echo "==========================="
+    echo "public                 - Running Public IPs"
+    echo "private                - Running Private IPs"
+    echo "complete_info          - Complete EC2 Details"
+    echo "create <count>         - Create Ubuntu EC2 instances"
+    echo "delete                 - Delete ALL running instances"
+    echo
+    read -rp "Enter choice: " choice count
+else
+    choice="$1"
+    count="$2"
+fi
+
+case "$choice" in
+
+    public)
+        aws ec2 describe-instances \
+            --filters "Name=instance-state-name,Values=running" \
+            --query "Reservations[].Instances[].PublicIpAddress" \
+            --output text | tr '\t' '\n'
+        ;;
+
+    private)
+        aws ec2 describe-instances \
+            --filters "Name=instance-state-name,Values=running" \
+            --query "Reservations[].Instances[].PrivateIpAddress" \
+            --output text | tr '\t' '\n'
+        ;;
+
+    complete_info)
+        aws ec2 describe-instances \
+            --filters Name=instance-state-name,Values=running \
+            --query "Reservations[*].Instances[*].{
+                Name:Tags[?Key=='Name'].Value|[0],
+                PublicIP:PublicIpAddress,
+                PrivateIP:PrivateIpAddress,
+                SecurityGroup:SecurityGroups[*].GroupName|join(', ',@),
+                VpcId:VpcId,
+                InstanceType:InstanceType
+            }" \
+            --output table
+        ;;
+
+    create)
+
+        if [ -z "$count" ]; then
+            echo "Usage: getec2 create <count>"
+            return 1
+        fi
+
+        for ((i=1;i<=count;i++))
+        do
+            echo "Creating server$i..."
+
+            aws ec2 run-instances \
+                --image-id "$AMI_ID" \
+                --instance-type "$INSTANCE_TYPE" \
+                --key-name "$KEY_NAME" \
+                --security-group-ids "$SECURITY_GROUP" \
+                --subnet-id "$SUBNET_ID" \
+                --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=server$i}]" \
+                --count 1 >/dev/null
+
+            echo "server$i created."
+        done
+        ;;
+
+    delete)
+
+        ids=$(aws ec2 describe-instances \
+            --filters Name=instance-state-name,Values=running \
+            --query "Reservations[].Instances[].InstanceId" \
+            --output text)
+
+        if [ -z "$ids" ]; then
+            echo "No running instances found."
+            return
+        fi
+
+        echo "Running Instance IDs:"
+        echo "$ids" | tr '\t' '\n'
+        echo
+
+        read -rp "Terminate ALL running instances? (yes/no): " ans
+
+        ans=$(echo "$ans" | tr '[:upper:]' '[:lower:]')
+
+        if [ "$ans" = "yes" ] || [ "$ans" = "y" ]; then
+            aws ec2 terminate-instances --instance-ids $ids
+            echo "Termination initiated."
+        else
+            echo "Cancelled."
+        fi
+        ;;
+
+    *)
+        echo "Invalid option: $choice"
+        ;;
+esac
+```
+
+}
+
+\#updating my host inventory
+update\_inventory() {
+local cluster="$1"
+
+```
+if [ -z "$cluster" ]; then
+    read -rp "Enter cluster name: " cluster
+
+    if [ -z "$cluster" ]; then
+        echo "Cluster name cannot be empty."
+        return 1
+    fi
+fi
+
+echo -e "\n[$cluster]\n$(getec2 public)" | tee -a /opt/ansible/inventories/hosts
+```
+
+}
+
