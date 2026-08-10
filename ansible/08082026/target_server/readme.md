@@ -61,7 +61,7 @@ sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
 ```bash
 cd /tmp
 
-wget https://downloads.apache.org/tomcat/tomcat-10/v10.1.42/bin/apache-tomcat-10.1.42.tar.gz
+wget https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.57/bin/apache-tomcat-10.1.57.tar.gz   
 ```
 
 ---
@@ -71,8 +71,7 @@ wget https://downloads.apache.org/tomcat/tomcat-10/v10.1.42/bin/apache-tomcat-10
 ```bash
 sudo mkdir -p /opt/tomcat
 
-sudo tar -xzf apache-tomcat-10.1.42.tar.gz \
--C /opt/tomcat --strip-components=1
+sudo tar -xzf apache-tomcat-10.1.57.tar.gz -C /opt/tomcat --strip-components=1
 ```
 
 ---
