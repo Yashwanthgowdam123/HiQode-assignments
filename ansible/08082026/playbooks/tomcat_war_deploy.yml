@@ -1,0 +1,116 @@
+---
+- name: Deploy Java WAR to Apache Tomcat
+  hosts: tomcat_war
+  become: yes
+
+  vars:
+    war_name: hello-webapp.war
+    app_name: hello-webapp
+
+    local_war: /opt/ansible/packages/hello-webapp/target/hello-webapp.war
+
+    tomcat_service: tomcat
+    deploy_path: /opt/tomcat/webapps
+    backup_path: /opt/tomcat/backup
+
+  tasks:
+
+    - name: Create backup directory
+      file:
+        path: "{{ backup_path }}"
+        state: directory
+        owner: tomcat
+        group: tomcat
+        mode: '0755'
+
+    ####################################################################
+    # 1. Stop Tomcat
+    ####################################################################
+
+    - name: Stop Tomcat
+      systemd:
+        name: "{{ tomcat_service }}"
+        state: stopped
+
+    ####################################################################
+    # 2. Backup Existing WAR
+    ####################################################################
+
+    - name: Backup existing WAR
+      copy:
+        src: "{{ deploy_path }}/{{ war_name }}"
+        dest: "{{ backup_path }}/{{ war_name }}.{{ ansible_date_time.iso8601_basic }}"
+        remote_src: yes
+      ignore_errors: yes
+
+    ####################################################################
+    # 3. Backup Extracted Application
+    ####################################################################
+
+    - name: Backup extracted application directory
+      command:
+        cmd: >
+          cp -r
+          {{ deploy_path }}/{{ app_name }}
+          {{ backup_path }}/{{ app_name }}_{{ ansible_date_time.iso8601_basic }}
+      ignore_errors: yes
+
+    ####################################################################
+    # 4. Remove Old Deployment
+    ####################################################################
+
+    - name: Remove old WAR
+      file:
+        path: "{{ deploy_path }}/{{ war_name }}"
+        state: absent
+
+    - name: Remove extracted application
+      file:
+        path: "{{ deploy_path }}/{{ app_name }}"
+        state: absent
+
+    ####################################################################
+    # 5. Deploy New WAR
+    ####################################################################
+
+    - name: Copy new WAR
+      copy:
+        src: "{{ local_war }}"
+        dest: "{{ deploy_path }}/{{ war_name }}"
+        owner: tomcat
+        group: tomcat
+        mode: '0644'
+
+    ####################################################################
+    # 6. Start Tomcat
+    ####################################################################
+
+    - name: Start Tomcat
+      systemd:
+        name: "{{ tomcat_service }}"
+        state: started
+        enabled: yes
+
+    ####################################################################
+    # 7. Wait for Deployment
+    ####################################################################
+
+    - name: Wait for Tomcat Port
+      wait_for:
+        port: 8080
+        delay: 5
+        timeout: 60
+
+    ####################################################################
+    # 8. Verify Application
+    ####################################################################
+
+    - name: Verify application
+      uri:
+        url: "http://localhost:8080/{{ app_name }}"
+        status_code: 200
+      register: healthcheck
+
+    - name: Display health check
+      debug:
+        var: healthcheck.status
