@@ -65,7 +65,7 @@ This works because the owner of the key is executing the command.
 
 # Solution 2: Execute Ansible Using sudo
 
-Instead of switching users, execute the command as the `ubuntu` user.
+Instead of switching users, execute the command as the `root` user.
 
 ```bash
 sudo su
