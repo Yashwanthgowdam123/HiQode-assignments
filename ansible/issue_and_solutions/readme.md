@@ -36,6 +36,11 @@ ubuntu@98.xx.xx.xx: Permission denied (publickey)
 
 Although the SSH key existed and was valid, the **yashwanth** user did not have permission to read the PEM file located inside another user's home directory (`/home/ubuntu`).
 
+```bash
+ls -lrt /home/ubuntu/pemfile/AwsPrivateKey.pem
+-r-------- 1 **ubuntu ubuntu** 1679 Jul 21 22:26 /home/ubuntu/pemfile/AwsPrivateKey.pem
+```
+
 As a result, SSH could not load the private key and authentication failed.
 
 ---
@@ -51,9 +56,7 @@ sudo su - ubuntu
 Run the ad-hoc command:
 
 ```bash
-ansible -i /opt/ansible/inventories/hosts trial \
-  -m shell \
-  -a "uptime -p"
+ansible -i /opt/ansible/inventories/hosts trial -m shell -a "uptime -p"
 ```
 
 This works because the owner of the key is executing the command.
@@ -65,15 +68,15 @@ This works because the owner of the key is executing the command.
 Instead of switching users, execute the command as the `ubuntu` user.
 
 ```bash
-sudo -u ubuntu ansible \
-  -i /opt/ansible/inventories/hosts \
-  trial \
-  -m shell \
-  -a "uptime -p"
+sudo su
+ansible -i /opt/ansible/inventories/hosts trial -m shell -a "uptime -p"
 ```
 
 or simply run Ansible using `sudo` if appropriate for your environment.
 
+```bash
+sudo ansible -i /opt/ansible/inventories/hosts trial -m shell -a "uptime -p"
+```
 ---
 
 # Solution 3: Grant Access Using ACL (Recommended)
@@ -111,9 +114,7 @@ getfacl /home/ubuntu/pemfile/AwsPrivateKey.pem
 Now the `yashwanth` user can execute:
 
 ```bash
-ansible -i /opt/ansible/inventories/hosts trial \
-  -m shell \
-  -a "uptime -p"
+ansible -i /opt/ansible/inventories/hosts trial -m shell -a "uptime -p"
 ```
 
 without encountering any SSH key permission issues.
