@@ -1,0 +1,8 @@
+---
+- name: Ping all AWS EC2 instances
+  hosts: "{{ host }}"
+  gather_facts: no
+
+  tasks:
+    - name: Ping
+      ping:
