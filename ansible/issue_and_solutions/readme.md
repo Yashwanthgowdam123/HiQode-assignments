@@ -38,7 +38,7 @@ Although the SSH key existed and was valid, the **yashwanth** user did not have 
 
 ```bash
 ls -lrt /home/ubuntu/pemfile/AwsPrivateKey.pem
--r-------- 1 **ubuntu** **ubuntu** 1679 Jul 21 22:26 /home/ubuntu/pemfile/AwsPrivateKey.pem
+-r-------- 1 **ubuntu ubuntu** 1679 Jul 21 22:26 /home/ubuntu/pemfile/AwsPrivateKey.pem
 ```
 
 As a result, SSH could not load the private key and authentication failed.
