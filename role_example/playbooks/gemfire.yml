@@ -1,0 +1,7 @@
+---
+- name: Configure GemFire Servers
+  hosts: gemfire_servers
+  become: yes
+
+  roles:
+    - gemfire

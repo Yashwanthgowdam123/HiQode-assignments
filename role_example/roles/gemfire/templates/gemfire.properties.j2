@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<cache
+    xmlns="http://geode.apache.org/schema/cache"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://geode.apache.org/schema/cache
+        http://geode.apache.org/schema/cache/cache-1.0.xsd">
+
+    <!-- ===================================================== -->
+    <!-- PDX Configuration                                     -->
+    <!-- ===================================================== -->
+
+    <pdx
+        persistent="{{ pdx.persistent | lower }}"
+        read-serialized="{{ pdx.read_serialized | lower }}"
+        ignore-unread-fields="{{ pdx.ignore_unread_fields | lower }}"
+        disk-store-name="{{ pdx.disk_store }}"/>
+
+    <!-- ===================================================== -->
+    <!-- Gateway Receiver                                      -->
+    <!-- ===================================================== -->
+
+{% if gateway_receiver.enabled %}
+    <gateway-receiver
+        start-port="{{ gateway_receiver.start_port }}"
+        end-port="{{ gateway_receiver.end_port }}"/>
+{% endif %}
+
+    <!-- ===================================================== -->
+    <!-- Gateway Sender                                        -->
+    <!-- ===================================================== -->
+
+{% if gateway_sender.enabled %}
+    <gateway-sender
+        id="{{ gateway_sender.id }}"
+        remote-distributed-system-id="{{ gateway_sender.remote_ds_id }}"
+        parallel="{{ gateway_sender.parallel | lower }}"
+        socket-buffer-size="{{ gateway_sender.socket_buffer_size }}"
+        batch-size="{{ gateway_sender.batch_size }}"
+        batch-time-interval="{{ gateway_sender.batch_time_interval }}"/>
+{% endif %}
+
+    <!-- ===================================================== -->
+    <!-- Regions                                               -->
+    <!-- ===================================================== -->
+
+{% for region in regions %}
+    <region name="{{ region.name }}" refid="{{ region.type }}">
+{% if gateway_sender.enabled %}
+        <gateway-sender-ids>{{ gateway_sender.id }}</gateway-sender-ids>
+{% endif %}
+    </region>
+{% endfor %}
+
+</cache>

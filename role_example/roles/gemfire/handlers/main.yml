@@ -1,0 +1,5 @@
+---
+- name: restart gemfire
+  service:
+    name: gemfire
+    state: restarted

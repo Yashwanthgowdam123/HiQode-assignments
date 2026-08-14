@@ -1,0 +1,7 @@
+[gemfire_servers]
+server1 ansible_host=192.168.1.101
+server2 ansible_host=192.168.1.102
+
+[gemfire_servers:vars]
+ansible_user=ubuntu
+ansible_ssh_private_key_file=~/.ssh/id_rsa

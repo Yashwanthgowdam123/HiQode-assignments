@@ -1,0 +1,29 @@
+cluster_name: DEV
+
+gateway_sender:
+  enabled: true
+  id: DEV_TO_DR
+  remote_ds_id: 2
+  parallel: false
+  socket_buffer_size: 524288
+  batch_size: 100
+  batch_time_interval: 1000
+
+gateway_receiver:
+  enabled: true
+  start_port: 1530
+  end_port: 1550
+
+pdx:
+  persistent: true
+  read_serialized: true
+  ignore_unread_fields: false
+  disk_store: PDXDiskStore
+
+regions:
+  - name: Customer
+    type: PARTITION
+  - name: Orders
+    type: PARTITION
+  - name: Inventory
+    type: REPLICATE

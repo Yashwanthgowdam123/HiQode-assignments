@@ -1,0 +1,26 @@
+---
+- name: Create configuration directory
+  file:
+    path: "{{ gemfire_config_dir }}"
+    state: directory
+    owner: gemfire
+    group: gemfire
+    mode: '0755'
+
+- name: Deploy cache.xml
+  template:
+    src: cache.xml.j2
+    dest: "{{ gemfire_config_dir }}/cache.xml"
+    owner: gemfire
+    group: gemfire
+    mode: '0644'
+  notify: restart gemfire
+
+- name: Deploy gemfire.properties
+  template:
+    src: gemfire.properties.j2
+    dest: "{{ gemfire_config_dir }}/gemfire.properties"
+    owner: gemfire
+    group: gemfire
+    mode: '0644'
+  notify: restart gemfire

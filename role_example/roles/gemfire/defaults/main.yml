@@ -1,0 +1,38 @@
+gemfire_home: /opt/gemfire
+gemfire_config_dir: /opt/gemfire/config
+
+cluster_name: cluster1
+
+locators:
+  - locator1.example.com[10334]
+  - locator2.example.com[10334]
+
+log_level: config
+
+# PDX
+pdx:
+  persistent: true
+  read_serialized: true
+  ignore_unread_fields: false
+  disk_store: PDXDiskStore
+
+# WAN
+gateway_sender:
+  enabled: true
+  id: NYC
+  remote_ds_id: 2
+  parallel: false
+  socket_buffer_size: 524288
+  batch_size: 100
+  batch_time_interval: 1000
+
+gateway_receiver:
+  enabled: true
+  start_port: 1530
+  end_port: 1550
+
+regions:
+  - name: Customers
+    type: PARTITION
+  - name: Orders
+    type: PARTITION
