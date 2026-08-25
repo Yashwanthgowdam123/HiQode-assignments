@@ -5,8 +5,8 @@
 # =========================================================
 
 # --- Thresholds ---
-disk_usage_threshold: 80      # percent used on / before cleanup triggers
-memory_usage_threshold: 90    # percent used before flagging (no auto-fix, informational)
+disk_usage_threshold: 30     # percent used on / before cleanup triggers
+memory_usage_threshold: 30    # percent used before flagging (no auto-fix, informational)
 
 # --- Services that must always be running ---
 critical_services:
