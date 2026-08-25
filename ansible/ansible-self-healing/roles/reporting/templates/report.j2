@@ -1,0 +1,37 @@
+=====================================================
+ Self-Healing Ansible Remediation Report
+=====================================================
+Host           : {{ inventory_hostname }}
+Generated at   : {{ ansible_date_time.iso8601 }}
+Reachable      : {{ host_reachable | default(true) }}
+
+--- System Health ---
+Disk usage (before cleanup) : {{ disk_usage_percent | default('n/a') }}%
+Disk usage (final)          : {{ final_health.disk_usage_percent | default('n/a') }}%
+Memory usage (final)        : {{ final_health.memory_usage_percent | default('n/a') }}%
+Uptime                      : {{ system_uptime | default('n/a') }}
+
+--- Service Status (final) ---
+{% for svc, state in (final_health.services | default({})).items() %}
+{{ '%-15s'|format(svc) }} : {{ state }}
+{% endfor %}
+
+--- Disk Remediation ---
+Remediation triggered    : {{ disk_needs_remediation | default(false) }}
+Disk usage after cleanup : {{ disk_usage_percent_after | default('n/a') }}%
+
+--- User / Directory Checks ---
+Changes made: {{ (user_dir_changes | default([]) | join(', ')) if (user_dir_changes | default([])) else 'None' }}
+
+--- Configuration Drift ---
+Fixes applied: {{ (config_drift_fixed | default([]) | join(', ')) if (config_drift_fixed | default([])) else 'None' }}
+
+--- Overall Status ---
+Manual intervention required : {{ manual_intervention_required | default(false) }}
+{% if manual_intervention_required | default(false) %}
+Reasons:
+{% for reason in manual_intervention_reasons | default([]) %}
+  - {{ reason }}
+{% endfor %}
+{% endif %}
+=====================================================

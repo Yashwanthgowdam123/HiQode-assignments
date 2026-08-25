@@ -1,0 +1,41 @@
+---
+# Re-verify system state after all remediation steps have run.
+# This is the "did the fix actually work" gate.
+
+- name: Re-check disk usage
+  ansible.builtin.shell: "df -h / | tail -1 | awk '{print $5}' | tr -d '%'"
+  changed_when: false
+  register: final_disk_check
+
+- name: Re-check memory usage
+  ansible.builtin.shell: "free | awk '/Mem:/ {printf(\"%.0f\", $3/$2 * 100)}'"
+  changed_when: false
+  register: final_memory_check
+
+- name: Re-gather service facts for final validation
+  ansible.builtin.service_facts:
+
+- name: Build final per-service state map
+  ansible.builtin.set_fact:
+    final_service_states: "{{ final_service_states | default({}) | combine({item: (ansible_facts.services[item + '.service'].state | default('not-found'))}) }}"
+  loop: "{{ critical_services }}"
+
+- name: Build final health snapshot
+  ansible.builtin.set_fact:
+    final_health:
+      disk_usage_percent: "{{ final_disk_check.stdout | int }}"
+      memory_usage_percent: "{{ final_memory_check.stdout | int }}"
+      services: "{{ final_service_states }}"
+
+- name: Flag if disk usage is still critical after all remediation
+  ansible.builtin.set_fact:
+    manual_intervention_required: true
+    manual_intervention_reasons: "{{ manual_intervention_reasons + ['Final validation failed: disk usage still ' + final_health.disk_usage_percent | string + '%'] }}"
+  when: final_health.disk_usage_percent | int > disk_usage_threshold | int
+
+- name: Flag if any critical service is still not running
+  ansible.builtin.set_fact:
+    manual_intervention_required: true
+    manual_intervention_reasons: "{{ manual_intervention_reasons + ['Final validation failed: ' + item + ' is ' + final_service_states[item]] }}"
+  loop: "{{ critical_services }}"
+  when: final_service_states[item] != 'running'

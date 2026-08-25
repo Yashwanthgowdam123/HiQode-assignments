@@ -1,0 +1,31 @@
+---
+- name: Ensure remote report directory exists
+  ansible.builtin.file:
+    path: "{{ report_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Generate remediation report on the target host
+  ansible.builtin.template:
+    src: report.j2
+    dest: "{{ report_dir }}/{{ inventory_hostname }}_remediation_{{ ansible_date_time.iso8601_basic_short }}.txt"
+    mode: "0644"
+  register: report_file
+
+- name: Fetch report back to the control node
+  ansible.builtin.fetch:
+    src: "{{ report_file.dest }}"
+    dest: "{{ local_report_dir }}/"
+    flat: true
+
+- name: Print per-host summary to console
+  ansible.builtin.debug:
+    msg: |
+      Host: {{ inventory_hostname }}
+      Status: {{ 'NEEDS MANUAL INTERVENTION' if manual_intervention_required else 'HEALTHY / SELF-HEALED' }}
+      {% if manual_intervention_required %}
+      Reasons:
+      {% for reason in manual_intervention_reasons %}
+        - {{ reason }}
+      {% endfor %}
+      {% endif %}

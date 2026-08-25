@@ -1,0 +1,34 @@
+---
+# Self-Healing Server Monitoring & Remediation
+# Run: ansible-playbook site.yml
+# Dry-run (no changes): ansible-playbook site.yml --check --diff
+# Single host: ansible-playbook site.yml --limit web1
+
+- name: Self-Healing Server Monitoring and Remediation
+  hosts: all
+  become: true
+  gather_facts: true
+  any_errors_fatal: false
+
+  pre_tasks:
+    - name: Initialize per-host remediation tracking facts
+      ansible.builtin.set_fact:
+        manual_intervention_required: false
+        manual_intervention_reasons: []
+
+  roles:
+    - connectivity_check
+    - system_health
+    - service_management
+    - disk_remediation
+    - user_directory_check
+    - config_drift
+    - health_validation
+    - reporting
+
+  post_tasks:
+    - name: Play-level summary
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }} ->
+          {{ 'NEEDS MANUAL INTERVENTION' if manual_intervention_required else 'HEALTHY / SELF-HEALED' }}

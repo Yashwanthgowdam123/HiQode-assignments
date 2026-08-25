@@ -1,0 +1,44 @@
+---
+# Example config-drift checks. Extend this pattern for any file/setting
+# your environment must enforce (sysctl values, cron entries, etc).
+
+- name: Correct sshd PermitRootLogin drift
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin no"
+    backup: true
+    validate: "sshd -t -f %s"
+  register: sshd_config_result
+  notify: restart sshd
+
+- name: Read current hostname
+  ansible.builtin.command: hostname
+  changed_when: false
+  register: current_hostname
+
+- name: Correct hostname drift
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+  when: current_hostname.stdout != inventory_hostname
+  register: hostname_result
+  ignore_errors: true
+
+- name: Flush handlers so config-dependent services restart immediately
+  ansible.builtin.meta: flush_handlers
+
+- name: Record sshd config drift fix
+  ansible.builtin.set_fact:
+    config_drift_fixed: "{{ config_drift_fixed | default([]) + ['sshd_config: PermitRootLogin corrected to no'] }}"
+  when: sshd_config_result.changed
+
+- name: Record hostname drift fix
+  ansible.builtin.set_fact:
+    config_drift_fixed: "{{ config_drift_fixed | default([]) + ['hostname corrected to ' + inventory_hostname] }}"
+  when: hostname_result is defined and hostname_result.changed
+
+- name: Flag hostname correction failure for manual intervention
+  ansible.builtin.set_fact:
+    manual_intervention_required: true
+    manual_intervention_reasons: "{{ manual_intervention_reasons + ['Failed to correct hostname drift'] }}"
+  when: hostname_result is defined and hostname_result.failed | default(false)

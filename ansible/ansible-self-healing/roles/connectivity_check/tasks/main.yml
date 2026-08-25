@@ -1,0 +1,19 @@
+---
+- name: Ping host to verify connectivity
+  ansible.builtin.ping:
+  register: connectivity_result
+  ignore_errors: true
+
+- name: Set connectivity fact
+  ansible.builtin.set_fact:
+    host_reachable: "{{ connectivity_result is succeeded }}"
+
+- name: Record unreachable host for manual intervention
+  ansible.builtin.set_fact:
+    manual_intervention_required: true
+    manual_intervention_reasons: "{{ manual_intervention_reasons + ['Host unreachable via ping/SSH'] }}"
+  when: not host_reachable
+
+- name: Stop remaining checks on this host if it is unreachable
+  ansible.builtin.meta: end_host
+  when: not host_reachable

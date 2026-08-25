@@ -1,0 +1,9 @@
+# Replace with your actual EC2 instances (or point this back at your
+# existing dynamic inventory / aws_ec2.yml as used in your ansible.cfg)
+[webservers]
+web1 ansible_host=10.0.1.10
+web2 ansible_host=10.0.1.11
+
+[all:vars]
+ansible_user=ubuntu
+ansible_ssh_private_key_file=/home/ubuntu/pemfile/AwsPrivateKey.pem

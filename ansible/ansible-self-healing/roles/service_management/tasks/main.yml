@@ -1,0 +1,38 @@
+---
+- name: Gather current service facts
+  ansible.builtin.service_facts:
+
+- name: Record initial state of each critical service
+  ansible.builtin.set_fact:
+    service_states_initial: "{{ service_states_initial | default({}) | combine({item: (ansible_facts.services[item + '.service'].state | default('not-found'))}) }}"
+  loop: "{{ critical_services }}"
+
+- name: Restart services that are not running
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop: "{{ critical_services }}"
+  when: service_states_initial[item] != 'running'
+  register: service_restart
+  ignore_errors: true
+
+- name: Re-gather service facts after remediation attempts
+  ansible.builtin.service_facts:
+
+- name: Record final state of each critical service
+  ansible.builtin.set_fact:
+    service_states_final: "{{ service_states_final | default({}) | combine({item: (ansible_facts.services[item + '.service'].state | default('not-found'))}) }}"
+  loop: "{{ critical_services }}"
+
+- name: Build a readable service status report
+  ansible.builtin.set_fact:
+    service_status_report: "{{ service_status_report | default([]) + [{'service': item, 'initial_state': service_states_initial[item], 'final_state': service_states_final[item], 'restarted': service_states_initial[item] != 'running'}] }}"
+  loop: "{{ critical_services }}"
+
+- name: Record services that could not be brought back up
+  ansible.builtin.set_fact:
+    manual_intervention_required: true
+    manual_intervention_reasons: "{{ manual_intervention_reasons + ['Service not running after restart attempt: ' + item] }}"
+  loop: "{{ critical_services }}"
+  when: service_states_final[item] != 'running'

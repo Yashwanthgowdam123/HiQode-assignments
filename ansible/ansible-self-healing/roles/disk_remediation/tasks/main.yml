@@ -1,0 +1,33 @@
+---
+- name: Skip disk remediation - usage below threshold
+  ansible.builtin.debug:
+    msg: "Disk usage {{ disk_usage_percent }}% is below the {{ disk_usage_threshold }}% threshold - no cleanup needed"
+  when: not disk_needs_remediation
+
+- name: Reclaim disk space by cleaning old logs/files
+  when: disk_needs_remediation
+  block:
+    - name: Find and remove old files matching cleanup patterns
+      ansible.builtin.shell: >
+        find {{ item.0.path }} -type f -name "{{ item.1 }}" -mtime +{{ item.0.age_days }} -delete
+      loop: "{{ log_cleanup_paths | subelements('patterns') }}"
+      register: cleanup_result
+      changed_when: cleanup_result.rc == 0
+      failed_when: false
+      loop_control:
+        label: "{{ item.0.path }}/{{ item.1 }} (older than {{ item.0.age_days }}d)"
+
+    - name: Re-check disk usage after cleanup
+      ansible.builtin.shell: "df -h / | tail -1 | awk '{print $5}' | tr -d '%'"
+      changed_when: false
+      register: disk_usage_after
+
+    - name: Update disk usage fact after cleanup
+      ansible.builtin.set_fact:
+        disk_usage_percent_after: "{{ disk_usage_after.stdout | int }}"
+
+    - name: Flag if cleanup did not bring disk usage back under threshold
+      ansible.builtin.set_fact:
+        manual_intervention_required: true
+        manual_intervention_reasons: "{{ manual_intervention_reasons + ['Disk usage still above threshold after cleanup: ' + disk_usage_percent_after | string + '%'] }}"
+      when: disk_usage_percent_after | int > disk_usage_threshold | int

@@ -1,0 +1,49 @@
+---
+# =========================================================
+# Self-Healing Remediation Configuration
+# Tune these per-environment. Nothing else needs to change.
+# =========================================================
+
+# --- Thresholds ---
+disk_usage_threshold: 80      # percent used on / before cleanup triggers
+memory_usage_threshold: 90    # percent used before flagging (no auto-fix, informational)
+
+# --- Services that must always be running ---
+critical_services:
+  - nginx
+  - sshd
+  - cron
+
+# --- Disk cleanup targets when threshold is breached ---
+log_cleanup_paths:
+  - path: /var/log
+    age_days: 14
+    patterns:
+      - "*.log.gz"
+      - "*.log.[0-9]"
+      - "*.gz"
+  - path: /tmp
+    age_days: 7
+    patterns:
+      - "*"
+
+# --- Users that must exist on every managed host ---
+required_users:
+  - name: appuser
+    groups: sudo
+    shell: /bin/bash
+
+# --- Directories that must exist with correct ownership/perms ---
+required_directories:
+  - path: /opt/app
+    owner: appuser
+    group: appuser
+    mode: "0755"
+  - path: /opt/app/logs
+    owner: appuser
+    group: appuser
+    mode: "0755"
+
+# --- Reporting ---
+report_dir: /home/ubuntu/remediation_reports   # on the managed host
+local_report_dir: ./reports                    # fetched back to the control node

@@ -1,0 +1,25 @@
+---
+- name: Ensure required users exist
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups | default(omit) }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    state: present
+    create_home: true
+    append: true
+  loop: "{{ required_users }}"
+  register: user_result
+
+- name: Ensure required directories exist with correct ownership/permissions
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ required_directories }}"
+  register: dir_result
+
+- name: Record which users/directories were created or fixed
+  ansible.builtin.set_fact:
+    user_dir_changes: "{{ (user_result.results | selectattr('changed') | map(attribute='item.name') | map('regex_replace', '^', 'user:') | list) + (dir_result.results | selectattr('changed') | map(attribute='item.path') | map('regex_replace', '^', 'dir:') | list) }}"
