@@ -1,0 +1,48 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - default-jdk
+      - apache2
+      - nginx
+      - tomcat10
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Configure Nginx to listen on {{ nginx_port }}
+  ansible.builtin.replace:
+    path: /etc/nginx/sites-available/default
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  loop:
+    - regexp: 'listen 80 default_server;'
+      replace: 'listen {{ nginx_port }} default_server;'
+    - regexp: 'listen \[::\]:80 default_server;'
+      replace: 'listen [::]:{{ nginx_port }} default_server;'
+  when: ansible_os_family == "Debian"
+
+- name: Ensure Apache2 is stopped and disabled
+  ansible.builtin.service:
+    name: apache2
+    state: stopped
+    enabled: false
+  when: ansible_os_family == "Debian"
+
+- name: Ensure Nginx is stopped and disabled
+  ansible.builtin.service:
+    name: nginx
+    state: stopped
+    enabled: false
+  when: ansible_os_family == "Debian"
+
+- name: Ensure Tomcat10 is stopped and disabled
+  ansible.builtin.service:
+    name: tomcat10
+    state: stopped
+    enabled: false
+  when: ansible_os_family == "Debian"

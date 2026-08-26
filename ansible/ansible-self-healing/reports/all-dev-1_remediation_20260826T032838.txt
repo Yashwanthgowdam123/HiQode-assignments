@@ -1,0 +1,35 @@
+=====================================================
+ Self-Healing Ansible Remediation Report
+=====================================================
+Host           : all-dev-1
+Generated at   : 2026-08-26T03:28:38Z
+Reachable      : True
+
+--- System Health ---
+Disk usage (before cleanup) : 47%
+Disk usage (final)          : 47%
+Memory usage (final)        : 46%
+Uptime                      : up 10 minutes
+
+--- Service Status (final) ---
+nginx           : running
+tomcat10        : running
+apache2         : running
+
+--- Disk Remediation ---
+Remediation triggered    : True
+Disk usage after cleanup : 47%
+
+--- User / Directory Checks ---
+Changes made: user:yash, dir:/opt/app, dir:/opt/app/logs
+
+--- Configuration Drift ---
+Fixes applied: sshd_config: PermitRootLogin corrected to no, hostname corrected to all-dev-1
+
+--- Overall Status ---
+Manual intervention required : True
+Reasons:
+  - High memory usage: 35%
+  - Disk usage still above threshold after cleanup: 47%
+  - Final validation failed: disk usage still 47%
+=====================================================

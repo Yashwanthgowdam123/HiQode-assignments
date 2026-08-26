@@ -17,6 +17,7 @@
         manual_intervention_reasons: []
 
   roles:
+    - installation_tna
     - connectivity_check
     - system_health
     - service_management

@@ -1,0 +1,358 @@
+
+playbook: site.yml
+
+  play #1 (aws_ec2): Self-Healing Server Monitoring and Remediation	TAGS: []
+    pattern: ['aws_ec2']
+    hosts (3):
+      tomcat-lab-2
+      tomcat-lab-1
+      tomcat-lab-3
+
+PLAY [Self-Healing Server Monitoring and Remediation] **************************
+
+TASK [Gathering Facts] *********************************************************
+[0;32mok: [tomcat-lab-1][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-2][0m
+
+TASK [Initialize per-host remediation tracking facts] **************************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [connectivity_check : Ping host to verify connectivity] *******************
+[0;32mok: [tomcat-lab-1][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-2][0m
+
+TASK [connectivity_check : Set connectivity fact] ******************************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [connectivity_check : Record unreachable host for manual intervention] ****
+[0;36mskipping: [tomcat-lab-2][0m
+[0;36mskipping: [tomcat-lab-3][0m
+[0;36mskipping: [tomcat-lab-1][0m
+
+TASK [connectivity_check : Stop remaining checks on this host if it is unreachable] ***
+[0;36mskipping: [tomcat-lab-2][0m
+
+TASK [connectivity_check : Stop remaining checks on this host if it is unreachable] ***
+[0;36mskipping: [tomcat-lab-3][0m
+
+TASK [connectivity_check : Stop remaining checks on this host if it is unreachable] ***
+[0;36mskipping: [tomcat-lab-1][0m
+
+TASK [system_health : Gather disk usage percentage for root filesystem] ********
+[0;32mok: [tomcat-lab-1][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-2][0m
+
+TASK [system_health : Set disk usage fact] *************************************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [system_health : Flag high disk usage for remediation] ********************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [system_health : Gather memory usage percentage] **************************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [system_health : Set memory usage fact] ***********************************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [system_health : Flag high memory usage (informational only, not auto-fixed)] ***
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [system_health : Warn when memory usage is high] **************************
+[0;32mok: [tomcat-lab-2] => {[0m
+[0;32m    "msg": "WARNING: memory usage is 46% on tomcat-lab-2"[0m
+[0;32m}[0m
+[0;32mok: [tomcat-lab-3] => {[0m
+[0;32m    "msg": "WARNING: memory usage is 46% on tomcat-lab-3"[0m
+[0;32m}[0m
+[0;32mok: [tomcat-lab-1] => {[0m
+[0;32m    "msg": "WARNING: memory usage is 46% on tomcat-lab-1"[0m
+[0;32m}[0m
+
+TASK [system_health : Record high memory for manual review] ********************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [system_health : Gather system uptime] ************************************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [system_health : Set uptime fact] *****************************************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [service_management : Gather current service facts] ***********************
+[0;32mok: [tomcat-lab-1][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-2][0m
+
+TASK [service_management : Record initial state of each critical service] ******
+[0;32mok: [tomcat-lab-2] => (item=nginx)[0m
+[0;32mok: [tomcat-lab-2] => (item=tomcat10)[0m
+[0;32mok: [tomcat-lab-3] => (item=nginx)[0m
+[0;32mok: [tomcat-lab-2] => (item=apache2)[0m
+[0;32mok: [tomcat-lab-3] => (item=tomcat10)[0m
+[0;32mok: [tomcat-lab-3] => (item=apache2)[0m
+[0;32mok: [tomcat-lab-1] => (item=nginx)[0m
+[0;32mok: [tomcat-lab-1] => (item=tomcat10)[0m
+[0;32mok: [tomcat-lab-1] => (item=apache2)[0m
+
+TASK [service_management : Restart services that are not running] **************
+[0;36mskipping: [tomcat-lab-2] => (item=nginx) [0m
+[0;36mskipping: [tomcat-lab-2] => (item=tomcat10) [0m
+[0;36mskipping: [tomcat-lab-2] => (item=apache2) [0m
+[0;36mskipping: [tomcat-lab-3] => (item=nginx) [0m
+[0;36mskipping: [tomcat-lab-3] => (item=tomcat10) [0m
+[0;36mskipping: [tomcat-lab-3] => (item=apache2) [0m
+[0;36mskipping: [tomcat-lab-2][0m
+[0;36mskipping: [tomcat-lab-3][0m
+[0;36mskipping: [tomcat-lab-1] => (item=nginx) [0m
+[0;36mskipping: [tomcat-lab-1] => (item=tomcat10) [0m
+[0;36mskipping: [tomcat-lab-1] => (item=apache2) [0m
+[0;36mskipping: [tomcat-lab-1][0m
+
+TASK [service_management : Re-gather service facts after remediation attempts] ***
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [service_management : Record final state of each critical service] ********
+[0;32mok: [tomcat-lab-2] => (item=nginx)[0m
+[0;32mok: [tomcat-lab-2] => (item=tomcat10)[0m
+[0;32mok: [tomcat-lab-3] => (item=nginx)[0m
+[0;32mok: [tomcat-lab-2] => (item=apache2)[0m
+[0;32mok: [tomcat-lab-3] => (item=tomcat10)[0m
+[0;32mok: [tomcat-lab-3] => (item=apache2)[0m
+[0;32mok: [tomcat-lab-1] => (item=nginx)[0m
+[0;32mok: [tomcat-lab-1] => (item=tomcat10)[0m
+[0;32mok: [tomcat-lab-1] => (item=apache2)[0m
+
+TASK [service_management : Build a readable service status report] *************
+[0;32mok: [tomcat-lab-2] => (item=nginx)[0m
+[0;32mok: [tomcat-lab-2] => (item=tomcat10)[0m
+[0;32mok: [tomcat-lab-2] => (item=apache2)[0m
+[0;32mok: [tomcat-lab-3] => (item=nginx)[0m
+[0;32mok: [tomcat-lab-3] => (item=tomcat10)[0m
+[0;32mok: [tomcat-lab-3] => (item=apache2)[0m
+[0;32mok: [tomcat-lab-1] => (item=nginx)[0m
+[0;32mok: [tomcat-lab-1] => (item=tomcat10)[0m
+[0;32mok: [tomcat-lab-1] => (item=apache2)[0m
+
+TASK [service_management : Record services that could not be brought back up] ***
+[0;36mskipping: [tomcat-lab-2] => (item=nginx) [0m
+[0;36mskipping: [tomcat-lab-2] => (item=tomcat10) [0m
+[0;36mskipping: [tomcat-lab-2] => (item=apache2) [0m
+[0;36mskipping: [tomcat-lab-3] => (item=nginx) [0m
+[0;36mskipping: [tomcat-lab-2][0m
+[0;36mskipping: [tomcat-lab-3] => (item=tomcat10) [0m
+[0;36mskipping: [tomcat-lab-3] => (item=apache2) [0m
+[0;36mskipping: [tomcat-lab-3][0m
+[0;36mskipping: [tomcat-lab-1] => (item=nginx) [0m
+[0;36mskipping: [tomcat-lab-1] => (item=tomcat10) [0m
+[0;36mskipping: [tomcat-lab-1] => (item=apache2) [0m
+[0;36mskipping: [tomcat-lab-1][0m
+
+TASK [disk_remediation : Skip disk remediation - usage below threshold] ********
+[0;36mskipping: [tomcat-lab-2][0m
+[0;36mskipping: [tomcat-lab-3][0m
+[0;36mskipping: [tomcat-lab-1][0m
+
+TASK [disk_remediation : Find and remove old files matching cleanup patterns] ***
+[0;33mchanged: [tomcat-lab-2] => (item=/var/log/*.log.gz (older than 14d))[0m
+[0;33mchanged: [tomcat-lab-3] => (item=/var/log/*.log.gz (older than 14d))[0m
+[0;33mchanged: [tomcat-lab-1] => (item=/var/log/*.log.gz (older than 14d))[0m
+[0;33mchanged: [tomcat-lab-2] => (item=/var/log/*.log.[0-9] (older than 14d))[0m
+[0;33mchanged: [tomcat-lab-3] => (item=/var/log/*.log.[0-9] (older than 14d))[0m
+[0;33mchanged: [tomcat-lab-1] => (item=/var/log/*.log.[0-9] (older than 14d))[0m
+[0;33mchanged: [tomcat-lab-2] => (item=/var/log/*.gz (older than 14d))[0m
+[0;33mchanged: [tomcat-lab-3] => (item=/var/log/*.gz (older than 14d))[0m
+[0;33mchanged: [tomcat-lab-1] => (item=/var/log/*.gz (older than 14d))[0m
+[0;33mchanged: [tomcat-lab-3] => (item=/tmp/* (older than 7d))[0m
+[0;33mchanged: [tomcat-lab-2] => (item=/tmp/* (older than 7d))[0m
+[0;33mchanged: [tomcat-lab-1] => (item=/tmp/* (older than 7d))[0m
+
+TASK [disk_remediation : Re-check disk usage after cleanup] ********************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [disk_remediation : Update disk usage fact after cleanup] *****************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [disk_remediation : Flag if cleanup did not bring disk usage back under threshold] ***
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [user_directory_check : Ensure required users exist] **********************
+[0;33mchanged: [tomcat-lab-1] => (item={'name': 'yash', 'groups': 'sudo', 'shell': '/bin/bash'})[0m
+[0;33mchanged: [tomcat-lab-2] => (item={'name': 'yash', 'groups': 'sudo', 'shell': '/bin/bash'})[0m
+[0;33mchanged: [tomcat-lab-3] => (item={'name': 'yash', 'groups': 'sudo', 'shell': '/bin/bash'})[0m
+
+TASK [user_directory_check : Ensure required directories exist with correct ownership/permissions] ***
+[0;33mchanged: [tomcat-lab-2] => (item={'path': '/opt/app', 'owner': 'yash', 'group': 'yash', 'mode': '0755'})[0m
+[0;33mchanged: [tomcat-lab-1] => (item={'path': '/opt/app', 'owner': 'yash', 'group': 'yash', 'mode': '0755'})[0m
+[0;33mchanged: [tomcat-lab-3] => (item={'path': '/opt/app', 'owner': 'yash', 'group': 'yash', 'mode': '0755'})[0m
+[0;33mchanged: [tomcat-lab-1] => (item={'path': '/opt/app/logs', 'owner': 'yash', 'group': 'yash', 'mode': '0755'})[0m
+[0;33mchanged: [tomcat-lab-2] => (item={'path': '/opt/app/logs', 'owner': 'yash', 'group': 'yash', 'mode': '0755'})[0m
+[0;33mchanged: [tomcat-lab-3] => (item={'path': '/opt/app/logs', 'owner': 'yash', 'group': 'yash', 'mode': '0755'})[0m
+
+TASK [user_directory_check : Record which users/directories were created or fixed] ***
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [config_drift : Correct sshd PermitRootLogin drift] ***********************
+[0;33mchanged: [tomcat-lab-2][0m
+[0;33mchanged: [tomcat-lab-3][0m
+[0;33mchanged: [tomcat-lab-1][0m
+
+TASK [config_drift : Read current hostname] ************************************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [config_drift : Correct hostname drift] ***********************************
+[0;33mchanged: [tomcat-lab-1][0m
+[0;33mchanged: [tomcat-lab-3][0m
+[0;33mchanged: [tomcat-lab-2][0m
+
+TASK [config_drift : Flush handlers so config-dependent services restart immediately] ***
+
+TASK [config_drift : Flush handlers so config-dependent services restart immediately] ***
+
+TASK [config_drift : Flush handlers so config-dependent services restart immediately] ***
+
+RUNNING HANDLER [config_drift : restart sshd] **********************************
+[0;33mchanged: [tomcat-lab-1][0m
+[0;33mchanged: [tomcat-lab-2][0m
+[0;33mchanged: [tomcat-lab-3][0m
+
+TASK [config_drift : Record sshd config drift fix] *****************************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [config_drift : Record hostname drift fix] ********************************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [config_drift : Flag hostname correction failure for manual intervention] ***
+[0;36mskipping: [tomcat-lab-2][0m
+[0;36mskipping: [tomcat-lab-3][0m
+[0;36mskipping: [tomcat-lab-1][0m
+
+TASK [health_validation : Re-check disk usage] *********************************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [health_validation : Re-check memory usage] *******************************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [health_validation : Re-gather service facts for final validation] ********
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [health_validation : Build final per-service state map] *******************
+[0;32mok: [tomcat-lab-2] => (item=nginx)[0m
+[0;32mok: [tomcat-lab-2] => (item=tomcat10)[0m
+[0;32mok: [tomcat-lab-2] => (item=apache2)[0m
+[0;32mok: [tomcat-lab-3] => (item=nginx)[0m
+[0;32mok: [tomcat-lab-3] => (item=tomcat10)[0m
+[0;32mok: [tomcat-lab-3] => (item=apache2)[0m
+[0;32mok: [tomcat-lab-1] => (item=nginx)[0m
+[0;32mok: [tomcat-lab-1] => (item=tomcat10)[0m
+[0;32mok: [tomcat-lab-1] => (item=apache2)[0m
+
+TASK [health_validation : Build final health snapshot] *************************
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-1][0m
+[0;32mok: [tomcat-lab-3][0m
+
+TASK [health_validation : Flag if disk usage is still critical after all remediation] ***
+[0;32mok: [tomcat-lab-2][0m
+[0;32mok: [tomcat-lab-3][0m
+[0;32mok: [tomcat-lab-1][0m
+
+TASK [health_validation : Flag if any critical service is still not running] ***
+[0;36mskipping: [tomcat-lab-2] => (item=nginx) [0m
+[0;36mskipping: [tomcat-lab-2] => (item=tomcat10) [0m
+[0;36mskipping: [tomcat-lab-2] => (item=apache2) [0m
+[0;36mskipping: [tomcat-lab-3] => (item=nginx) [0m
+[0;36mskipping: [tomcat-lab-3] => (item=tomcat10) [0m
+[0;36mskipping: [tomcat-lab-3] => (item=apache2) [0m
+[0;36mskipping: [tomcat-lab-2][0m
+[0;36mskipping: [tomcat-lab-3][0m
+[0;36mskipping: [tomcat-lab-1] => (item=nginx) [0m
+[0;36mskipping: [tomcat-lab-1] => (item=tomcat10) [0m
+[0;36mskipping: [tomcat-lab-1] => (item=apache2) [0m
+[0;36mskipping: [tomcat-lab-1][0m
+
+TASK [reporting : Ensure remote report directory exists] ***********************
+[0;33mchanged: [tomcat-lab-2][0m
+[0;33mchanged: [tomcat-lab-3][0m
+[0;33mchanged: [tomcat-lab-1][0m
+
+TASK [reporting : Generate remediation report on the target host] **************
+[0;33mchanged: [tomcat-lab-1][0m
+[0;33mchanged: [tomcat-lab-3][0m
+[0;33mchanged: [tomcat-lab-2][0m
+
+TASK [reporting : Fetch report back to the control node] ***********************
+[0;33mchanged: [tomcat-lab-2][0m
+[0;33mchanged: [tomcat-lab-1][0m
+[0;33mchanged: [tomcat-lab-3][0m
+
+TASK [reporting : Print per-host summary to console] ***************************
+[0;32mok: [tomcat-lab-2] => {[0m
+[0;32m    "msg": "Host: tomcat-lab-2\nStatus: NEEDS MANUAL INTERVENTION\nReasons:\n  - High memory usage: 46%\n  - Disk usage still above threshold after cleanup: 47%\n  - Final validation failed: disk usage still 47%\n"[0m
+[0;32m}[0m
+[0;32mok: [tomcat-lab-3] => {[0m
+[0;32m    "msg": "Host: tomcat-lab-3\nStatus: NEEDS MANUAL INTERVENTION\nReasons:\n  - High memory usage: 46%\n  - Disk usage still above threshold after cleanup: 47%\n  - Final validation failed: disk usage still 47%\n"[0m
+[0;32m}[0m
+[0;32mok: [tomcat-lab-1] => {[0m
+[0;32m    "msg": "Host: tomcat-lab-1\nStatus: NEEDS MANUAL INTERVENTION\nReasons:\n  - High memory usage: 46%\n  - Disk usage still above threshold after cleanup: 47%\n  - Final validation failed: disk usage still 47%\n"[0m
+[0;32m}[0m
+
+TASK [Play-level summary] ******************************************************
+[0;32mok: [tomcat-lab-2] => {[0m
+[0;32m    "msg": "tomcat-lab-2 -> NEEDS MANUAL INTERVENTION"[0m
+[0;32m}[0m
+[0;32mok: [tomcat-lab-3] => {[0m
+[0;32m    "msg": "tomcat-lab-3 -> NEEDS MANUAL INTERVENTION"[0m
+[0;32m}[0m
+[0;32mok: [tomcat-lab-1] => {[0m
+[0;32m    "msg": "tomcat-lab-1 -> NEEDS MANUAL INTERVENTION"[0m
+[0;32m}[0m
+
+PLAY RECAP *********************************************************************
+[0;33mtomcat-lab-1[0m               : [0;32mok=43  [0m [0;33mchanged=9   [0m unreachable=0    failed=0    [0;36mskipped=6   [0m rescued=0    ignored=0   
+[0;33mtomcat-lab-2[0m               : [0;32mok=43  [0m [0;33mchanged=9   [0m unreachable=0    failed=0    [0;36mskipped=6   [0m rescued=0    ignored=0   
+[0;33mtomcat-lab-3[0m               : [0;32mok=43  [0m [0;33mchanged=9   [0m unreachable=0    failed=0    [0;36mskipped=6   [0m rescued=0    ignored=0   
+

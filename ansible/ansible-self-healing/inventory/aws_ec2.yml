@@ -1,0 +1,24 @@
+plugin: amazon.aws.aws_ec2
+
+regions:
+  - us-east-1
+
+filters:
+  instance-state-name: running
+
+hostnames:
+  - tag:Name
+
+compose:
+  ansible_host: public_ip_address
+  ansible_user: ubuntu
+
+keyed_groups:
+  - key: tags.Application
+    prefix: "app"
+
+  - key: tags.Environment
+    prefix: "env"
+
+  - key: tags.Application + '_' + tags.Environment
+    prefix: "env-app"
