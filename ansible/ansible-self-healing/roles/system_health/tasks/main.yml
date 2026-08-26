@@ -1,4 +1,5 @@
 ---
+#Checking for Disk
 - name: Gather disk usage percentage for root filesystem
   ansible.builtin.shell: "df -h / | tail -1 | awk '{print $5}' | tr -d '%'"
   changed_when: false
@@ -8,6 +9,11 @@
   ansible.builtin.set_fact:
     disk_usage_percent: "{{ disk_usage_result.stdout | int }}"
 
+- name: Flag high disk usage for remediation
+  ansible.builtin.set_fact:
+    disk_needs_remediation: "{{ disk_usage_percent | int > disk_usage_threshold | int }}"
+
+#Checking for Memory
 - name: Gather memory usage percentage
   ansible.builtin.shell: "free | awk '/Mem:/ {printf(\"%.0f\", $3/$2 * 100)}'"
   changed_when: false
@@ -16,19 +22,6 @@
 - name: Set memory usage fact
   ansible.builtin.set_fact:
     memory_usage_percent: "{{ memory_usage_result.stdout | int }}"
-
-- name: Gather system uptime
-  ansible.builtin.command: uptime -p
-  changed_when: false
-  register: uptime_result
-
-- name: Set uptime fact
-  ansible.builtin.set_fact:
-    system_uptime: "{{ uptime_result.stdout }}"
-
-- name: Flag high disk usage for remediation
-  ansible.builtin.set_fact:
-    disk_needs_remediation: "{{ disk_usage_percent | int > disk_usage_threshold | int }}"
 
 - name: Flag high memory usage (informational only, not auto-fixed)
   ansible.builtin.set_fact:
@@ -44,3 +37,13 @@
     manual_intervention_required: true
     manual_intervention_reasons: "{{ manual_intervention_reasons + ['High memory usage: ' + memory_usage_percent | string + '%'] }}"
   when: memory_high
+
+# Checking for Uptime
+- name: Gather system uptime
+  ansible.builtin.command: uptime -p
+  changed_when: false
+  register: uptime_result
+
+- name: Set uptime fact
+  ansible.builtin.set_fact:
+    system_uptime: "{{ uptime_result.stdout }}"
