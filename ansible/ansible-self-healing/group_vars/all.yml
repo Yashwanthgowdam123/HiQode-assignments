@@ -29,21 +29,21 @@ log_cleanup_paths:
 
 # --- Users that must exist on every managed host ---
 required_users:
-  - name: appuser
+  - name: yash
     groups: sudo
     shell: /bin/bash
 
 # --- Directories that must exist with correct ownership/perms ---
 required_directories:
   - path: /opt/app
-    owner: appuser
-    group: appuser
+    owner: yash
+    group: yash
     mode: "0755"
   - path: /opt/app/logs
-    owner: appuser
-    group: appuser
+    owner: yash
+    group: yash
     mode: "0755"
 
 # --- Reporting ---
-report_dir: /home/ubuntu/remediation_reports   # on the managed host
+report_dir: /home/yash/remediation_reports   # on the managed host
 local_report_dir: ./reports                    # fetched back to the control node
