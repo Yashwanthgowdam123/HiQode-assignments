@@ -11,8 +11,8 @@ memory_usage_threshold: 30    # percent used before flagging (no auto-fix, infor
 # --- Services that must always be running ---
 critical_services:
   - nginx
-  - sshd
-  - cron
+  - tomcat10
+  - apache2
 
 # --- Disk cleanup targets when threshold is breached ---
 log_cleanup_paths:
