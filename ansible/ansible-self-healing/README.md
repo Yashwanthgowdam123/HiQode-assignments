@@ -63,15 +63,6 @@ ansible-self-healing/
    console summary at the end of each play — hosts marked
    `NEEDS MANUAL INTERVENTION` list the specific reasons.
 
-## Scheduling (self-healing on a cadence)
-
-Run it as a cron job or systemd timer on your Ansible control node, e.g.
-every 15 minutes:
-
-```
-*/15 * * * * cd /opt/ansible/ansible-self-healing && /usr/bin/ansible-playbook site.yml >> /var/log/self-healing.log 2>&1
-```
-
 ## Design notes (idempotency & error handling)
 
 - Every remediation task is naturally idempotent (`file`, `user`, `systemd`,
