@@ -49,15 +49,16 @@ ansible-self-healing/
    `required_users`, `required_directories`, cleanup paths.
 3. Dry run first (no changes made, shows diffs):
    ```
-   ansible-playbook site.yml --check --diff
+   ansible-playbook ./site.yml -e "host=aws_ec2" -i /opt/ansible/inventories/aws_ec2.yml --check --diff
    ```
 4. Run for real:
    ```
-   ansible-playbook site.yml
+   ansible-playbook ./site.yml -e "host=aws_ec2" -i /opt/ansible/inventories/aws_ec2.yml --list-hosts
+   ansible-playbook ./site.yml -e "host=aws_ec2" -i /opt/ansible/inventories/aws_ec2.yml 
    ```
 5. Target one host, or a group:
    ```
-   ansible-playbook site.yml --limit web1
+   ansible-playbook ./site.yml -e "host=aws_ec2" --limit <server_ip> -i /opt/ansible/inventories/aws_ec2.yml
    ```
 6. Check `./reports/` for the generated report per host, and watch the
    console summary at the end of each play — hosts marked
