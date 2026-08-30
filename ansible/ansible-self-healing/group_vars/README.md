@@ -1,4 +1,5 @@
-````markdown
+
+```md
 ## Configuration (`vars/main.yml`)
 
 The remediation framework is fully configurable through the `vars/main.yml` file. Modify the values below to match your environment without changing any playbook or role logic.
