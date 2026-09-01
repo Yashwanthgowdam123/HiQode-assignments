@@ -39,7 +39,10 @@ Logs: Amazon CloudWatch Logs
 ```
 
 **Design pattern:** Fan-out-free, single-function scheduled worker. Stateless between invocations — all "state" (which snapshots exist, which are stale) is derived at runtime from resource tags, making the function safe to re-run, retry, or scale without a database.
-![Workflow Diagram](Automation_task_aws/architecture.png)
+
+<p align="center">
+  <img src="architecture.png" alt="Workflow Diagram" width="1000">
+</p>
 ---
 
 ## 2. Provisioned Resources
