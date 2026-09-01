@@ -40,7 +40,7 @@ ansible-self-healing/
 ```
 ## 🏗 Architecture
 
-![Workflow Diagram](ansible/ansible-self-healing/presentation/Self-Healing-Ansible-Analysis.png)
+![Workflow Diagram](presentation/Self-Healing-Ansible-Analysis.png)
 
 
 ## Usage
