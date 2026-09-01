@@ -38,6 +38,10 @@ ansible-self-healing/
 │       └── templates/report.j2
 └── reports/                  # fetched reports land here (gitignore this)
 ```
+## 🏗 Architecture
+
+![Workflow Diagram](ansible/ansible-self-healing/presentation/Self-Healing-Ansible-Analysis.png)
+
 
 ## Usage
 
